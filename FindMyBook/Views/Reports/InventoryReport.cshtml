@@ -1,0 +1,125 @@
+@model IEnumerable<FindMyBook.Models.InventoryReportViewModel>
+@{
+    ViewBag.Title = "Inventory Report";
+    Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-primary">Inventory Report</h2>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="@Url.Action("InventoryReport")">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="searchTerm">Search</label>
+                            <input type="text" class="form-control" id="searchTerm" name="searchTerm"
+                                   placeholder="Search by Name or ISBN" value="@Request["searchTerm"]" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="sortOrder">Sort by Price</label>
+                            <select id="sortOrder" name="sortOrder" class="form-control">
+                                <option value="">Sort by Name</option>
+                                <option value="Price_Asc" @(Request["sortOrder"] == "Price_Asc" ? "selected" : "")>Price Ascending</option>
+                                <option value="Price_Desc" @(Request["sortOrder"] == "Price_Desc" ? "selected" : "")>Price Descending</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="@Url.Action("InventoryReport")" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Price Distribution</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="priceChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Inventory Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Book ID</th>
+                            <th>Book Name</th>
+                            <th>ISBN</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.BookId</td>
+                                <td>@item.BookName</td>
+                                <td>@item.ISBN</td>
+                                <td>@item.Price.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const priceCtx = document.getElementById('priceChart').getContext('2d');
+    const priceData = @Html.Raw(Json.Encode(Model.Select(x => x.Price).ToArray()));
+    const priceRanges = ['0-500', '501-1000', '1001-1500', '1501-2000', '2001+'];
+    const counts = priceRanges.map(range => priceData.filter(price => {
+        if (range === '0-500') return price >= 0 && price <= 500;
+        if (range === '501-1000') return price > 500 && price <= 1000;
+        if (range === '1001-1500') return price > 1000 && price <= 1500;
+        if (range === '1501-2000') return price > 1500 && price <= 2000;
+        return price > 2000;
+    }).length);
+
+    new Chart(priceCtx, {
+        type: 'bar',
+        data: {
+            labels: priceRanges,
+            datasets: [{
+                label: 'Books per Price Range',
+                data: counts,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

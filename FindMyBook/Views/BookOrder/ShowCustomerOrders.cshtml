@@ -1,0 +1,30 @@
+@model IEnumerable<FindMyBook.ViewModels.BookViewModel>
+@{
+    ViewBag.Title = "Your Orders";
+}
+<div class="container-fluid body-content">
+    <h2>Your Orders</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Book Image</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Order Date</th>
+                <th>Delivery Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td><img src="@order.BookImage" alt="@order.Title" width="50" height="50" /></td>
+                    <td>@order.Title</td>
+                    <td>@order.Price</td>
+                    <td>@order.OrderDate.ToShortDateString()</td>
+                    <td>@order.DeliveryDate.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

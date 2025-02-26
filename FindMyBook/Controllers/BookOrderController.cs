@@ -1,0 +1,237 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using FindMyBook.Models;
+using FindMyBook.ViewModels;
+
+namespace FindMyBook.Controllers
+{
+    public class BookOrderController : Controller
+    {
+        findMyBookEntities1 db = new findMyBookEntities1();
+
+        // GET: BookOrder
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        // GET: BookOrder/Details/5
+        public ActionResult Details(int id)
+        {
+            // Fetch the cart item and associated book details
+            var bookDetail = (from cartItem in db.table_cart
+                              join book in db.table_book_detail on cartItem.book_id_FK equals book.book_id
+                              where cartItem.cart_id == id
+                              select new CartViewModel
+                              {
+                                  CartId = cartItem.cart_id,
+                                  BookId = book.book_id,
+                                  BookName = book.book_name,
+                                  Price = book.book_price,
+                                  BookImage = book.book_image,
+                                  IsbnNumber = book.book_isbn_number,
+                                  PublishedDate = book.book_published_date,
+                                  Language = book.book_language,
+                                  Pages = book.pages,
+
+                              }).FirstOrDefault();
+
+            if (bookDetail == null)
+            {
+                return HttpNotFound("Cart item not found.");
+            }
+
+            return View(bookDetail);
+        }
+
+        // GET: BookOrder/Create
+        public ActionResult Create(int id)
+        {
+            return View();
+        }
+
+        // POST: BookOrder/Create
+        [HttpPost]
+        public JsonResult Create(int CartId, double Price)
+        {
+            try
+            {
+                // TODO: Add insert logic here
+                var cartItem = db.table_cart.Find(CartId);
+                if (cartItem == null)
+                {
+                    return Json(new { status = 404, message = "Cart item not found." });
+                }
+
+                DateTime orderDate = DateTime.Now;
+                DateTime deliveryDate = orderDate.AddDays(10);
+
+                table_customer_order_book table_Customer_Order_Book = new table_customer_order_book
+                {
+                    customer_id_FK = cartItem.cart_id,
+                    total_price = Price,
+                    order_date = orderDate,
+                    delivery_date = deliveryDate,
+                    order_status_id_FK = 0,
+                    feedback_id_FK = 0,
+                    payment_id_FK = 0
+                };
+
+                db.table_customer_order_book.Add(table_Customer_Order_Book);
+
+                cartItem.confirmation_status = 1;
+                db.Entry(cartItem).State = EntityState.Modified;
+
+                db.SaveChanges();
+                //return RedirectToAction("Index");
+                return Json(new { status = 200, message = "Order confirmed successfully!" });
+            }
+            catch (Exception ex)
+            {
+                //return View();
+                return Json(new { status = 500, message = ex.Message });
+            }
+
+
+        }
+
+        // GET: BookOrder/Edit/5
+        public ActionResult Edit(int id)
+        {
+            return View();
+        }
+
+        // POST: BookOrder/Edit/5
+        [HttpPost]
+        public ActionResult Edit(int id, FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add update logic here
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: BookOrder/Delete/5
+        public ActionResult Delete(int id)
+        {
+            return View();
+        }
+
+        // POST: BookOrder/Delete/5
+        [HttpPost]
+        public ActionResult Delete(int id, FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add delete logic here
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // Get ordered book detail
+        public ActionResult ShowConfirmedOrderBook()
+        {
+            var confirmedBookInfo = (from customerOrderedBook in db.table_customer_order_book
+                                     join cartTable in db.table_cart on customerOrderedBook.customer_id_FK equals cartTable.cart_id
+                                     join customer in db.table_customer on cartTable.customer_id_FK equals customer.customer_id
+                                     join book in db.table_book_detail on cartTable.book_id_FK equals book.book_id
+                                     join author in db.table_author on book.author_id_FK equals author.author_id
+                                     join publisher in db.table_publisher on book.publisher_id_FK equals publisher.publisher_id
+                                     where customerOrderedBook.payment_id_FK == 1
+                                     select new BookViewModel
+                                     {
+
+                                         BookId = book.book_id,
+                                         Title = book.book_name,
+                                         BookImage = book.book_image,
+                                         CustomerName = customer.customer_first_name + " " + customer.customer_last_name,
+                                         Price = book.book_price,
+                                         PublisherName = publisher.publisher_name
+
+
+                                     }).ToList();
+
+            if (confirmedBookInfo == null)
+            {
+                return HttpNotFound("Item not found.");
+            }
+
+
+
+            return View(confirmedBookInfo);
+            //return Json(new { data = confirmedBookInfo }, JsonRequestBehavior.AllowGet);
+        }
+
+        // Get ordered book detail
+        public ActionResult ShowCustomerOrders()
+        {
+            if (Session["CustomerId"] == null)
+            {
+                ViewBag.Message = "Log in to view your orders";
+                return View("LoginMessage");
+            }
+
+            int customerId;
+            try
+            {
+                // Try to safely convert the session value to an integer
+                customerId = Convert.ToInt32(Session["CustomerId"]);
+            }
+            catch (InvalidCastException)
+            {
+                // Handle the invalid cast exception if the conversion fails
+                ViewBag.Message = "Session value for CustomerId is not valid.";
+                return View("LoginMessage");
+            }
+
+            var customerOrdersQuery = from customerOrderedBook in db.table_customer_order_book
+                                      join cartTable in db.table_cart on customerOrderedBook.customer_id_FK equals cartTable.cart_id
+                                      join book in db.table_book_detail on cartTable.book_id_FK equals book.book_id
+                                      where cartTable.customer_id_FK == customerId
+                                      select new
+                                      {
+                                          BookId = book.book_id,
+                                          Title = book.book_name,
+                                          BookImage = book.book_image,
+                                          Price = book.book_price,
+                                          OrderDate = customerOrderedBook.order_date,
+                                          DeliveryDate = customerOrderedBook.delivery_date,
+                                          OrderStatus = customerOrderedBook.order_status_id_FK
+                                      };
+
+            var customerOrders = customerOrdersQuery.ToList().Select(order => new BookViewModel
+            {
+                BookId = order.BookId,
+                Title = order.Title,
+                BookImage = order.BookImage,
+                Price = order.Price,
+                OrderDate = order.OrderDate,
+                DeliveryDate = order.DeliveryDate,
+                OrderStatus = order.OrderStatus.ToString() // Convert to string in memory
+            }).ToList();
+
+            if (customerOrders == null || !customerOrders.Any())
+            {
+                ViewBag.Message = "No orders found.";
+                return View("NoOrders");
+            }
+
+            return View(customerOrders);
+        }
+    }
+}

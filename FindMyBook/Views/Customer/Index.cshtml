@@ -1,0 +1,45 @@
+﻿@model IEnumerable<FindMyBook.ViewModels.CustomerViewModel>
+
+@{
+    ViewBag.Title = "Customer List";
+    Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+}
+
+    <table class="table table-bordered mb-4 text-white" style="border-color: #0E223B">
+        <thead>
+            <tr class="align-middle text-white" style="background-color: #1E1E2F">
+                <th class="text-light text-center">Customer ID</th>
+                <th class="text-light text-center">First Name</th>
+                <th class="text-light text-center">Last Name</th>
+                <th class="text-light text-center">Address</th>
+                <th class="text-light text-center">Username</th>
+                <th class="text-light text-center">Email</th>
+                <th class="text-light text-center">Phone Number</th>
+                <th class="text-light text-center">Account Creation Date</th>
+                <th class="text-light text-center">Profile Image</th>
+                <th class="text-light text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in Model)
+            {
+                <tr class="align-middle text-white" style="background-color: #2A2A2E">
+                    <td class="text-center">@customer.CustomerId</td>
+                    <td class="text-center">@customer.FirstName</td>
+                    <td class="text-center">@customer.LastName</td>
+                    <td class="text-center">@customer.Address</td>
+                    <td class="text-center">@customer.Username</td>
+                    <td class="text-center">@customer.Email</td>
+                    <td class="text-center">@customer.PhoneNumber</td>
+                    <td class="text-center">@customer.AccountCreationDate.ToShortDateString()</td>
+                    <td class="text-center">
+                        <img src="@Url.Content(customer.ProfileImage)" alt="Profile Image" width="50" height="50" class="img-thumbnail" />
+                    </td>
+                    <td class="text-center">
+                        @Html.ActionLink("Edit", "Edit", new { id = customer.CustomerId }, new { @class = "text-light" }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = customer.CustomerId }, new { @class = "text-light", onclick = "return confirm('Are you sure you want to delete this customer?');" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

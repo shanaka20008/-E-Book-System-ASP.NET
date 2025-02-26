@@ -1,0 +1,217 @@
+﻿@model FindMyBook.Models.table_customer
+
+@{
+    if (Session["AdminName"] != null)
+    {
+        ViewBag.AdminName = $"{Session["AdminName"]}";
+        ViewBag.Title = "Add customer";
+        Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+
+    }
+    else
+    {
+        ViewBag.Title = "Dashboard";
+        Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+    }
+}
+
+
+<div class="container-fluid p-5 rounded-3" style="max-width: 1100px; background-color: #1E1E2F;">
+
+    <h2 class="font-weight-bold text-light">Add Customers</h2>
+
+    @using (Html.BeginForm("SignUp", "Home", FormMethod.Post, new { enctype = "multipart/form-data", @id = "signUpForm" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            @* First name, Last name, Address *@
+            <div class="form-group d-flex align-items-center mb-3">
+
+                @* First Name *@
+                <div class="w-100 form-group me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.customer_first_name, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div class="">
+                        @Html.EditorFor(model => model.customer_first_name, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Enter your first name" } })
+                        @Html.ValidationMessageFor(model => model.customer_first_name, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+
+                @* Last Name *@
+                <div class="w-100 form-group me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.customer_last_name, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div class="">
+                        @Html.EditorFor(model => model.customer_last_name, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Enter your last name" } })
+                        @Html.ValidationMessageFor(model => model.customer_last_name, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+
+                @* Address *@
+                <div class="w-100 form-group me-3">
+                    <div>
+                        @Html.LabelFor(model => model.customer_address, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        @Html.EditorFor(model => model.customer_address, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Enter your address" } })
+                        @Html.ValidationMessageFor(model => model.customer_address, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+            </div>
+
+            @* Email, Phone, Image *@
+            <div class="form-group d-flex justify-content-between align-items-center mb-3">
+                @* Email *@
+                <div class="w-100 me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.email, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        @Html.EditorFor(model => model.email, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Enter your email address" } })
+                        @Html.ValidationMessageFor(model => model.email, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+
+                @* Phone number *@
+                <div class="w-100 me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.customer_phone_number, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        @Html.EditorFor(model => model.customer_phone_number, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Ex: 0777195282 / +94777195282" } })
+                        @Html.ValidationMessageFor(model => model.customer_phone_number, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+
+                @* Image *@
+                <div class="w-100 me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.customer_image, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        <input type="file" name="ImageFile" id="ImageFile" class="form-control bg-dark text-light border border-secondary" />
+                        <span class="text-danger d-block mt-1 visually-hidden" id="imgErrorElement">Image field is required.</span>
+                    </div>
+                </div>
+            </div>
+
+            @* Username, Password, Confirm Password *@
+            <div class="form-group d-flex justify-content-between align-items-center mb-3">
+
+                @* Username *@
+                <div class="w-100 form-group me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.customer_username, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        @Html.EditorFor(model => model.customer_username, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Enter your username" } })
+                        @Html.ValidationMessageFor(model => model.customer_username, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+
+                @* Password *@
+                <div class="w-100 form-group me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.customer_password, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        @Html.EditorFor(model => model.customer_password, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Enter your password" } })
+                        @Html.ValidationMessageFor(model => model.customer_password, "", new { @class = "text-danger d-block mt-1 " })
+                    </div>
+                </div>
+
+                @* Confirm Password *@
+                <div class="w-100 form-group me-3">
+                    <div class="d-flex">
+                        @Html.LabelFor(model => model.confirm_password, htmlAttributes: new { @class = "form-label mb-1 fw-semibold text-light" })
+                        <span class="text-danger">*</span>
+                    </div>
+                    <div>
+                        @Html.EditorFor(model => model.confirm_password, new { htmlAttributes = new { @class = "form-control bg-dark text-light border border-secondary", @placeholder = "Confirm password" } })
+                        @Html.ValidationMessageFor(model => model.confirm_password, "", new { @class = "text-danger d-block mt-1" })
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group mt-4">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" id="btnSubmit" value="Create Account" class="btn btn-light fw-semibold px-5 py-2 rounded-2" />
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <div class="col-md-offset-2 col-md-10">
+                    <label class="text-danger font-weight-bold">@ViewBag.Notification</label>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            const btnSubmitEl = document.querySelector("#btnSubmit");
+            const ImageFileEl = document.querySelector("#ImageFile");
+
+            btnSubmitEl.addEventListener("click", () => {
+                const imgErrorEl = document.querySelector("#imgErrorElement");
+                if (ImageFileEl.value === "") {
+                    imgErrorEl.classList.remove("visually-hidden");
+                } else {
+                    imgErrorEl.classList.add("visually-hidden");
+                }
+            });
+
+            $(document).on("submit", "#signUpForm", function (e) {
+                e.preventDefault(); // Prevent the form from submitting the traditional way
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '@Url.Action("SignUp", "Home")',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        Swal.fire({
+                            title: "Account created!",
+                            text: "Dear customer! Your sign-up process has been processed successfully.",
+                            icon: "success"
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle any errors that occurred during the AJAX request
+                        Swal.fire({
+                            title: "Error!",
+                            text: "There was an error processing your request. Please try again later.",
+                            icon: "error"
+                        });
+                    }
+                });
+            });
+        });
+
+
+    </script>
+}
+

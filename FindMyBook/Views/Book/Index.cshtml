@@ -1,0 +1,73 @@
+﻿@model IEnumerable<FindMyBook.ViewModels.BookViewModel>
+
+@{
+    if (Session["AdminName"] != null)
+    {
+        ViewBag.AdminName = $"{Session["AdminName"]}";
+        ViewBag.Title = "Entire book list";
+        Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+
+    }
+    else
+    {
+        ViewBag.Title = "Authors List";
+        Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+    }
+}
+
+<div class="mx-auto"></div>
+
+    <table class="table table-striped table-hover mb-0">
+        <tr class="align-middle">
+            <th class="text-center">No</th>
+            <th class="text-center">Book ID</th>
+            <th class="text-center">Title</th>
+            <th class="text-center">ISBN</th>
+            <th class="text-center">Book Image</th>
+            <th class="text-center">Author</th>
+            <th class="text-center">Publisher</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Book Language</th>
+            <th class="text-center">Price</th>
+            <th class="text-center">Pages</th>
+            <th class="text-center">Published Date</th>
+            <th class="text-center">Rating</th>
+            <th class="text-center">Actions</th>
+
+        </tr>
+        @{
+            int serialNumber = 0;
+
+        }
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+                <td class="text-center">
+                    @{
+                        serialNumber++;
+                    }
+                    @serialNumber
+                </td>
+                <td class="text-center">@item.BookId</td>
+                <td>@item.Title</td>
+                <td>@item.ISBN</td>
+                <td><img src="@Url.Content(item.BookImage)" class="object-fit-cover" alt="@item.Title" width="100" height="150" /></td>
+                <td>@item.AuthorName</td>
+                <td>@item.PublisherName</td>
+                <td class="text-center">@item.Status</td>
+                <td class="text-center">@item.BookLanguage</td>
+                <td class="text-center">@item.Price</td>
+                <td class="text-center">@item.Pages</td>
+                <td>@item.PublishedDate</td>
+                <td class="text-center">@item.Rating</td>
+                <td>
+                    @Html.ActionLink("Edit", "EditBook", new { id = item.BookId }) |
+                    @Html.ActionLink("Delete", "DeleteBook", new { id = item.BookId })
+                </td>
+
+
+            </tr>
+        }
+    </table>
+
+

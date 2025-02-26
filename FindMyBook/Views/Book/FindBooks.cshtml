@@ -1,0 +1,92 @@
+﻿@model IEnumerable<FindMyBook.ViewModels.BookViewModel>
+
+@{
+    ViewBag.Title = "Find Books";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <!-- Search Bar -->
+    <div class="row justify-content-center my-4">
+        <div class="col-md-8">
+            <div class="input-group rounded-3 border">
+                <span class="input-group-text bg-white border-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14" /></svg>
+                </span>
+                <input type="text" id="searchBook" class="form-control border-0 shadow-none" placeholder="Search books..." aria-label="Search books">
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Cards -->
+    <div class="row">
+        @foreach (var book in Model)
+        {
+            <div class="col-md-4 col-sm-6 mb-4 main-container">
+                <div class="card h-100">
+                    <img src="@Url.Content(book.BookImage)" class="card-img-top object-fit-cover" alt="@book.Title" style="height: 300px;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title text-truncate" title="@book.Title">@book.Title</h5>
+                            <p class="text-muted mb-0"><i class="fa-solid fa-star text-warning"></i> @book.Rating</p>
+                        </div>
+                        <p class="text-muted"><strong>Author:</strong> @book.AuthorName</p>
+                        <p class="text-muted"><strong>Price:</strong> LKR @book.Price</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        @Html.ActionLink("Add to cart", "AddCart", "Cart", new { id = book.BookId }, new { @class = "btn btn-primary w-100 mb-2", @id = "btnAddToCart" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Live search functionality
+            $("#searchBook").on("input", function () {
+                const searchText = $(this).val().toLowerCase();
+
+                $(".main-container").each(function () {
+                    const bookText = $(this).text().toLowerCase();
+                    $(this).toggle(bookText.includes(searchText));
+                });
+            });
+
+            // Add to cart functionality
+            $("body").on("click", "#btnAddToCart", function (e) {
+                e.preventDefault();
+                const customerId = '@Session["CustomerId"]';
+
+                if (!customerId) {
+                    Swal.fire({
+                        title: "Access required!",
+                        text: "Please log in to continue. Thank you.",
+                        icon: "info"
+                    }).then(() => {
+                        window.location.href = '@Url.Action("Login", "Home")';
+                    });
+                } else {
+                    const bookId = $(this).attr("href").split("/AddCart/")[1];
+
+                    $.post("/Cart/AddCart", { customerId, bookId })
+                        .done(response => {
+                            const { status } = response;
+                            if (status === "200") {
+                                Swal.fire({
+                                    title: "Book added!",
+                                    text: "Your item has been added to the cart!",
+                                    icon: "success"
+                                }).then(() => location.reload());
+                            }
+                        })
+                        .fail(error => {
+                            console.error("Error occurred:", error.responseText);
+                        });
+                }
+            });
+        });
+    </script>
+}

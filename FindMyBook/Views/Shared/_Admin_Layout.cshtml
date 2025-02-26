@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://img.freepik.com/free-vector/gradient-bookstore-logo_23-2149332417.jpg" rel="icon" type="image/x-icon" />
+    <title>@ViewBag.Title | E-Book Pvt. Ltd.</title>
+
+    @* Font Awesome CDN *@
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <style>
+        .navbar h3 {
+            margin: 0; /* Remove any default margins */
+            line-height: 1; /* Set consistent line-height */
+        }
+
+        .navbar .container {
+            align-items: center; /* Ensure vertical centering of items */
+            justify-content: space-between; /* Spread items to the edges */
+        }
+
+        .navbar {
+            padding-top: 0.5rem; /* Adjust top padding */
+            padding-bottom: 0.5rem; /* Match top padding */
+        }
+
+        .navbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+            .navbar-center a {
+                color: white;
+                font-weight: bold;
+                font-size: 18px;
+                text-decoration: none;
+            }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+        <div class="container d-flex justify-content-between align-items-center">
+            @Html.ActionLink("E-Book Pvt. Ltd.", "Index", "Home", new { area = "" }, new { @class = "navbar-brand font-weight-bold" })
+
+            <div class="navbar-center">
+                <a href="@Url.Action("Index", "Admin")">Admin Panel</a>
+            </div>
+
+            <div class="d-flex gap-3">
+                @Html.ActionLink("Login", "Index", "Admin", new { area = "" }, new { @class = "btn btn-outline-primary" })
+
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid body-content">
+        @RenderBody()
+    </div>
+    <div class="mt-auto">
+        <footer class="py-3 text-center" style="background-color: #f8f9fa">
+            <p class="mb-0" style="color: #6c757d">&copy; <span id="currentYear"></span> E-Book Pvt. Ltd. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

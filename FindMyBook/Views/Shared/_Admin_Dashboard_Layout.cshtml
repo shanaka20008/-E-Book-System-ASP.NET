@@ -1,0 +1,390 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://img.freepik.com/free-vector/gradient-bookstore-logo_23-2149332417.jpg" rel="icon" type="image/x-icon" />
+    <title>@ViewBag.Title | E-Book Pvt. Ltd.</title>
+
+    @* Font Awesome CDN *@
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+
+    @* SweetAlert CDN *@
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Check if session is active
+        var adminId = '@Session["AdminId"]';
+        if (adminId === '') {
+            // Redirect to login page if session is not active
+            Swal.fire({
+                title: "Unauthorized Access!",
+                text: "You don't have permission to access this portal!",
+                icon: "error"
+            }).then((result) => {
+
+                if (result.isConfirmed == true) {
+                    window.location.href = '@Url.Action("Index", "Home")';
+                }
+            });
+        }
+    });
+    </script>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+<style>
+    .admin-sidebar {
+        background-color: #212529; /* New sidebar background */
+        width: 280px;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        border-right: 1px solid #343a40; /* Slightly lighter border */
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        text-align: center;
+        border-bottom: 1px solid #343a40; /* Consistent with sidebar border */
+        color: #f8f9fa; /* Light text */
+    }
+
+    .profile-circle {
+        width: 64px;
+        height: 64px;
+        background-color: #0d6efd; /* Accent blue */
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-menu {
+        padding: 1rem;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #ced4da; /* Light gray text */
+        text-decoration: none;
+        border-radius: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s;
+    }
+
+        .menu-item:hover {
+            background-color: #343a40; /* Hover background */
+            color: #0d6efd; /* Hover text */
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+        }
+
+    .submenu {
+        margin-left: 2.5rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+        .submenu.show {
+            display: block;
+        }
+
+    .submenu-item {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #adb5bd; /* Submenu text */
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s;
+    }
+
+        .submenu-item:hover {
+            color: #0d6efd; /* Submenu hover */
+        }
+
+    .logout-section {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 1rem;
+        border-top: 1px solid #343a40; /* Matches sidebar border */
+    }
+
+    .logout-button {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #f03e3e; /* Logout button color */
+        text-decoration: none;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+        .logout-button:hover {
+            background-color: #495057; /* Logout hover background */
+            color: #ff6b6b; /* Logout hover text */
+        }
+
+    .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        min-height: 100vh;
+        background-color: #1d2124; /* Main content dark background */
+        color: #e9ecef; /* Main content light text */
+    }
+
+    .dropdown-toggle::after {
+        float: right;
+        margin-top: 8px;
+    }
+</style>
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <div class="profile-circle">
+                    <i class="fas fa-user-tie fa-lg text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Admin Panel</h3>
+            </div>
+
+            <!-- Navigation Menu -->
+            <ul class="nav-menu list-unstyled">
+                <!-- Overview -->
+                <li class="mb-2">
+                    <a href="@Url.Action("Dashboard", "Admin")" class="menu-item @(ViewContext.RouteData.Values["Action"].ToString() == "Dashboard" ? "active" : "")">
+                        <i class="fas fa-home"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+
+                <!-- Authors -->
+                <li class="mb-2">
+                    <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#authorSubmenu">
+                        <i class="fas fa-users"></i>
+                        <span>Authors</span>
+                    </a>
+                    <div class="collapse submenu" id="authorSubmenu">
+                        <a href="@Url.Action("AddAuthor", "Author")" class="submenu-item">Add Author</a>
+                        <a href="@Url.Action("ManageAuthors", "Author")" class="submenu-item">Manage Authors</a>
+                    </div>
+                </li>
+
+                <!-- Books -->
+                <li class="mb-2">
+                    <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#bookSubmenu">
+                        <i class="fas fa-book"></i>
+                        <span>Books</span>
+                    </a>
+                    <div class="collapse submenu" id="bookSubmenu">
+                        <a href="@Url.Action("AddBook", "Book")" class="submenu-item">Add Books</a>
+                        <a href="@Url.Action("Index", "Book")" class="submenu-item">Manage Books</a>
+                        <a href="@Url.Action("Create", "BookStatus")" class="submenu-item">Add Book Status</a>
+                    </div>
+                </li>
+
+                <!-- Customers -->
+                <li class="mb-2">
+                    <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#customerSubmenu">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                    <div class="collapse submenu" id="customerSubmenu">
+                        <a href="@Url.Action("AddCustomer", "Admin")" class="submenu-item">Add Customer</a>
+                        <a href="@Url.Action("Index", "Customer")" class="submenu-item">Manage Customers</a>
+                    </div>
+                </li>
+
+                <!-- Orders -->
+                <li class="mb-2">
+                    <a href="@Url.Action("ShowConfirmedOrderBook", "BookOrder")" class="menu-item">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li class="mb-2">
+                    <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#reportsSubmenu">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reports</span>
+                    </a>
+                    <div class="collapse submenu" id="reportsSubmenu">
+                        <a href="@Url.Action("SalesReport", "Reports")" class="submenu-item">Sales Report</a>
+                        <a href="@Url.Action("CustomerReport", "Reports")" class="submenu-item">Customer Report</a>
+                        <a href="@Url.Action("InventoryReport", "Reports")" class="submenu-item">Inventory Report</a>
+                    </div>
+                </li>
+
+                <!-- Publishers -->
+                <li class="mb-2">
+                    <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#publisherSubmenu">
+                        <i class="fas fa-building"></i>
+                        <span>Publishers</span>
+                    </a>
+                    <div class="collapse submenu" id="publisherSubmenu">
+                        <a href="@Url.Action("Create", "Publisher")" class="submenu-item">Add Publisher</a>
+                        <a href="@Url.Action("Index", "Publisher")" class="submenu-item">Manage Publishers</a>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Logout Section -->
+            <div class="logout-section">
+                <a href="@Url.Action("Logout", "Admin")" class="logout-button">
+                    <i class="fas fa-sign-out-alt me-3"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+            <!-- Main Content -->
+            <div class="flex-grow-1" style="margin-left: 280px;">
+                <div class="container-fluid p-4">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+
+
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        <script src="~/Scripts/bootstrap.min.js"></script>
+        <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+        @RenderSection("scripts", required: false)
+        <script>
+
+        @* Function for highlight active menu *@
+        function activeMenu(menuElementName, tagElementName) {
+            menuElementName.style.backgroundColor = "#E5EDFA"
+            menuElementName.classList.add("rounded-top");
+            menuElementName.classList.add("text-black")
+            tagElementName.classList.add("text-black", "fw-semibold")
+        }
+
+        @* Function for highligh dropdown menu active *@
+        function dropDownActiveMenu(menuHeaderElementName, mainMenuElementName, menuElementName, tagElementName) {
+            //@*
+            //        * menuHeaderElementName means heading of dropdown menu.It is inside an ANCHOR TAG(Ex: Books, Customers)
+            //    * mainMenuElementName means Main Menu list element id name.
+            //        * menuElementName means Sub - Element id name(Ex: Add books, Add customers).
+            //        * tagElementName means Sub - Element tag id name.
+            //    *@
+
+            mainMenuElementName.style.backgroundColor = "#E5EDFA"
+            mainMenuElementName.classList.add("rounded-top");
+            menuHeaderElementName.classList.add("text-black", "fw-semibold")
+
+            menuElementName.style.backgroundColor = "#E5EDFA"
+            menuElementName.classList.add("text-black")
+            tagElementName.classList.add("text-black", "fw-semibold")
+        }
+
+        const PATH_ORIGIN = window.location.origin;
+        const PATH_URL = window.location.href;
+
+        const dashboardMenuEl = document.querySelector("#dashboard-menu")
+        const addBookMenuEl = document.querySelector("#add-book-menu")
+
+        const bookHeaderEl = document.querySelector("#book-header")
+        const bookMenuEl = document.querySelector("#book-menu");
+
+        const customerHeaderEl = document.querySelector("#customer-header")
+        const addCustomerMenuEl = document.querySelector("#add-customer-menu")
+        const addAuthorMenuEl = document.querySelector("#add-author-menu")
+        const authorMenuEl = document.querySelector("#author-menu");
+        const authorHeaderEl = document.querySelector("#author-header");
+
+        const publisherHeaderEl = document.querySelector("#publisher-header")
+        const publisherMenuEl = document.querySelector("#publisher-menu")
+        const addPublisherMenuEl = document.querySelector("#add-publisher-menu")
+
+
+    if (PATH_URL == `${PATH_ORIGIN}/Admin/Dashboard`) {
+        //style = "background-color: #E5EDFA"
+        const overviewTagEl = document.querySelector("#overview-tag");
+
+        activeMenu(dashboardMenuEl, overviewTagEl)
+
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/Book/AddBook`) {
+
+        const addBookTagEl = document.querySelector("#add-book-tag")
+
+
+        dropDownActiveMenu(bookHeaderEl, bookMenuEl, addBookMenuEl, addBookTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/Admin/AddCustomer`) {
+
+        const customerMenuEl = document.querySelector("#customer-menu")
+        const addCustomerTagEl = document.querySelector("#add-customer-tag")
+
+        dropDownActiveMenu(customerHeaderEl, customerMenuEl, addCustomerMenuEl, addCustomerTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/Author/AddAuthor`) {
+
+        const addAuthorTagEl = document.querySelector("#add-author-tag");
+
+        dropDownActiveMenu(authorHeaderEl, authorMenuEl, addAuthorMenuEl, addAuthorTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/Author/ManageAuthors`) {
+
+        const manageAuthorMenuEl = document.querySelector("#manage-author-menu");
+        const manageAuthorTagEl = document.querySelector("#manage-author-tag");
+
+        dropDownActiveMenu(authorHeaderEl, authorMenuEl, manageAuthorMenuEl, manageAuthorTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/Publisher/Create`) {
+
+        const addPublisherTagEl = document.querySelector("#add-publisher-tag")
+
+        dropDownActiveMenu(publisherHeaderEl, publisherMenuEl, addPublisherMenuEl, addPublisherTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/Publisher`) {
+
+        const managePublisherMenuEl = document.querySelector("#manage-publisher-menu");
+        const managePublisherTagEl = document.querySelector("#manage-publisher-tag");
+
+        dropDownActiveMenu(publisherHeaderEl, publisherMenuEl, managePublisherMenuEl, managePublisherTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/BookStatus/Create`) {
+
+        const addBookStatusMenuEl = document.querySelector("#add-book-status-menu");
+        const addStatusTagEl = document.querySelector("#add-status-tag");
+
+        dropDownActiveMenu(bookHeaderEl, bookMenuEl, addBookStatusMenuEl, addStatusTagEl);
+    } else if (PATH_URL == `${PATH_ORIGIN}/Book`) {
+
+        const manageBookMenuEl = document.querySelector("#managE-Book Pvt. Ltd.-menu");
+        const manageBookTagEl = document.querySelector("#managE-Book Pvt. Ltd.-tag");
+
+        dropDownActiveMenu(bookHeaderEl, bookMenuEl, manageBookMenuEl, manageBookTagEl);
+
+    } else if (PATH_URL == `${PATH_ORIGIN}/BookOrder/ShowConfirmedOrderBook`) {
+
+        const orderMenuEl = document.querySelector("#order-menu");
+        const orderMenuTagEl = document.querySelector("#order-menu-tag")
+
+        activeMenu(orderMenuEl, orderMenuTagEl);
+    }
+        </script>
+
+</body>
+</html>

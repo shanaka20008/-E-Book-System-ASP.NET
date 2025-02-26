@@ -1,0 +1,251 @@
+﻿@{
+    if (Session["AdminName"] != null)
+    {
+        ViewBag.AdminName = $"{Session["AdminName"]}";
+        ViewBag.Title = $"{Session["AdminName"]}'s Dashboard";
+        Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+    }
+    else
+    {
+        ViewBag.Title = "Dashboard";
+        Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+    }
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        --primary-bg: #f0f2f5;
+        --card-bg: rgba(255, 255, 255, 0.9);
+        --shadow-color: rgba(0, 0, 0, 0.1);
+        --text-primary: #2d3748;
+        --text-secondary: #718096;
+    }
+
+    body {
+        background-color: var(--primary-bg);
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .dashboard {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .welcome-section {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 20px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+        transform: skewX(-20deg);
+    }
+
+    .welcome-title {
+        font-size: 1.8rem;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .welcome-subtitle {
+        opacity: 0.9;
+        margin: 0.5rem 0 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: block;
+        text-decoration: none;
+        color: var(--text-primary);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 6px var(--shadow-color);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px var(--shadow-color);
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .icon-authors { background: linear-gradient(135deg, #34d399, #059669); }
+    .icon-books { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+    .icon-customers { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+    .icon-orders { background: linear-gradient(135deg, #f472b6, #db2777); }
+    .icon-revenue { background: linear-gradient(135deg, #fbbf24, #d97706); }
+    .icon-pending { background: linear-gradient(135deg, #f87171, #dc2626); }
+    .icon-publishers { background: linear-gradient(135deg, #818cf8, #4f46e5); }
+
+    .stat-title {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0.5rem 0;
+    }
+</style>
+
+<div class="dashboard">
+    <section class="welcome-section">
+        <h1 class="welcome-title">Welcome back, @ViewBag.AdminName!</h1>
+        <p class="welcome-subtitle">Here's your bookstore's performance overview</p>
+    </section>
+
+    <div class="stats-grid">
+        <!-- Authors Card -->
+        <a href="@Url.Action("ManageAuthors", "Author")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-authors">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+            </div>
+            <p class="stat-title">Total Authors</p>
+            <h3 class="stat-value">
+                @{
+                    int totalAuthors = ViewBag.TotalAuthors ?? 0;
+                    @(totalAuthors < 10 ? "0" + totalAuthors.ToString() : totalAuthors.ToString())
+                }
+            </h3>
+        </a>
+
+        <!-- Books Card -->
+        <a href="@Url.Action("Index", "Book")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-books">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <p class="stat-title">Total Books</p>
+            <h3 class="stat-value">
+                @{
+                    int totalBooks = ViewBag.TotalBooks ?? 0;
+                    @(totalBooks < 10 ? "0" + totalBooks.ToString() : totalBooks.ToString())
+                }
+            </h3>
+        </a>
+
+        <!-- Customers Card -->
+        <a href="@Url.Action("Index", "Customer")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-customers">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <p class="stat-title">Total Customers</p>
+            <h3 class="stat-value">
+                @{
+                    int totalCustomers = ViewBag.TotalCustomers ?? 0;
+                    @(totalCustomers < 10 ? "0" + totalCustomers.ToString() : totalCustomers.ToString())
+                }
+            </h3>
+        </a>
+
+        <!-- Orders Card -->
+        <a href="@Url.Action("ShowConfirmedOrderBook", "BookOrder")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-orders">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+            </div>
+            <p class="stat-title">Total Orders</p>
+            <h3 class="stat-value">
+                @{
+                    int totalOrders = ViewBag.TotalOrders ?? 0;
+                    @(totalOrders < 10 ? "0" + totalOrders.ToString() : totalOrders.ToString())
+                }
+            </h3>
+        </a>
+
+        <!-- Revenue Card -->
+        <a href="@Url.Action("ShowConfirmedOrderBook", "BookOrder")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-revenue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+            </div>
+            <p class="stat-title">Total Revenue</p>
+            <h3 class="stat-value">
+                @String.Format(new System.Globalization.CultureInfo("en-LK"), "{0:C}", @ViewBag.TotalEarnings)
+            </h3>
+        </a>
+
+        <!-- Pending Orders -->
+        <a href="@Url.Action("Index", "BookOrder")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+            <p class="stat-title">Pending Orders</p>
+            <h3 class="stat-value">
+                @{
+                    int pendingOrders = ViewBag.TotalPendingPayments ?? 0;
+                    @(pendingOrders < 10 ? "0" + pendingOrders.ToString() : pendingOrders.ToString())
+                }
+            </h3>
+        </a>
+
+        <!-- Publishers Card -->
+        <a href="@Url.Action("Index", "Publisher")" class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon icon-publishers">
+                    <i class="fas fa-print"></i>
+                </div>
+            </div>
+            <p class="stat-title">Total Publishers</p>
+            <h3 class="stat-value">
+                @{
+                    int totalPublishers = ViewBag.TotalPublishers ?? 0;
+                    @(totalPublishers < 10 ? "0" + totalPublishers.ToString() : totalPublishers.ToString())
+                }
+            </h3>
+        </a>
+    </div>
+</div>

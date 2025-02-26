@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://img.freepik.com/free-vector/gradient-bookstore-logo_23-2149332417.jpg" rel="icon" type="image/x-icon" />
+    <title>@ViewBag.Title | E-Book Pvt. Ltd.</title>
+
+    @* SweetAlert CDN *@
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @* Font Awesome CDN *@
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/Site.css" rel="stylesheet" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+        <div class="container d-flex justify-content-between align-items-center">
+            @Html.ActionLink("E-Book Pvt. Ltd.", "Index", "Home", new { area = "" }, new { @class = "navbar-brand font-weight-bold" })
+
+            <ul class="navbar-nav">
+                <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                <li>@Html.ActionLink("Books", "FindBooks", "Book", new { area = "" }, new { @class = "nav-link" }) </li>
+                <li class="nav-link d-flex align-items-center py-0">
+                    @Html.ActionLink("Cart", "Index", "Cart", new { area = "" }, new { @class = "nav-link" })<sup id="countOrders" class="text-light"></sup>
+                </li>
+                <li>@Html.ActionLink("Orders", "ShowCustomerOrders", "BookOrder", new { area = "" }, new { @class = "nav-link" }) </li>
+            </ul>
+
+            <div class="d-flex gap-3">
+
+
+                @if (Session["CustomerName"] != null)
+                {
+                    var username = Session["CustomerName"];
+                    <div class="d-flex align-items-center">
+                        <p class="text-white mb-0 me-3">Hello @username</p>
+                        @Html.ActionLink("Logout", "Logout", "Home", new { area = "" }, new { @class = "btn btn-primary" })
+                    </div>
+                }
+                else
+                {
+                    @Html.ActionLink("Login", "Login", "Home", new { area = "" }, new { @class = "btn btn-outline-primary" })
+                    @Html.ActionLink("Sign Up", "SignUp", "Home", new { area = "" }, new { @class = "btn btn-primary" })
+                }
+            </div>
+        </div>
+    </nav>
+    <div>
+        @RenderBody()
+    </div>
+    <div class="mt-auto">
+        <footer class="py-3 text-center" style="background-color: #f8f9fa">
+            <p class="mb-0" style="color: #6c757d">&copy; <span id="currentYear"></span> E-Book Pvt. Ltd. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script>
+    $(document).ready(function () {
+        // Ensure the server-side code safely writes the session value into a JavaScript variable
+        const customerId = '@Session["CustomerId"]' !== 'null' ? '@Session["CustomerId"]' : null;
+
+        if (customerId) {
+            // Call the method to count cart items
+            $.ajax({
+                type: 'POST',
+                url: '/Cart/CountCartItems',
+                data: { customerId: customerId },
+                dataType: 'json',
+                success: function (response) {
+                    // console.log(response)
+                    const countOrdersEl = document.querySelector("#countOrders");
+                    const { count } = response;
+                    countOrdersEl.textContent = count;
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching cart count:", error);
+                }
+            });
+        } else {
+            console.log("0");
+        }
+    });
+    </script>
+
+
+</body>
+</html>

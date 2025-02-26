@@ -1,0 +1,103 @@
+@* Views/Book/EditBook.cshtml *@
+@model FindMyBook.Models.table_book_detail
+@{
+    ViewBag.Title = "Edit Book";
+    Layout = "~/Views/Shared/_Admin_Dashboard_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Edit Book</h2>
+    @using (Html.BeginForm("EditBook", "Book", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.book_id)
+        @Html.HiddenFor(model => model.book_image)
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.book_name, "Book Title", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.book_name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.book_name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.book_isbn_number, "ISBN", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.book_isbn_number, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.book_isbn_number, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.author_id_FK, "Author", new { @class = "control-label" })
+                    @Html.DropDownList("author_id_FK", (SelectList)ViewBag.Authors, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.publisher_id_FK, "Publisher", new { @class = "control-label" })
+                    @Html.DropDownList("publisher_id_FK", (SelectList)ViewBag.Publishers, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.book_status_id_FK, "Status", new { @class = "control-label" })
+                    @Html.DropDownList("book_status_id_FK", (SelectList)ViewBag.BookStatus, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Current Image</label>
+                    <img src="@Url.Content(Model.book_image)" alt="Current Image" class="img-thumbnail" style="max-height: 200px;" />
+                </div>
+                <div class="form-group mt-2">
+                    <label>New Image (optional)</label>
+                    <input type="file" name="newImage" class="form-control" accept="image/*" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.book_language, "Language", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.book_language, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.book_price, "Price", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.book_price, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.pages, "Pages", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.pages, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.book_published_date, "Published Date", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.book_published_date, new { htmlAttributes = new { @class = "form-control", type = "date" } })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.rating, "Rating", new { @class = "control-label" })
+                    @Html.EditorFor(model => model.rating, new { htmlAttributes = new { @class = "form-control", type = "number", min = "0", max = "5", step = "0.1" } })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Save Changes" class="btn btn-primary" />
+            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    }
+</div>
